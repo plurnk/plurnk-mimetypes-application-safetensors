@@ -78,14 +78,17 @@ export function readSafetensors(bytes: Uint8Array): SafetensorsHeader | null {
             if (typeof info === "object" && info !== null) metadata = info as Record<string, string>;
             continue;
         }
-        if (typeof info === "object" && info !== null) {
-            const rec = info as Record<string, unknown>;
-            tensors.push({
-                name,
-                dtype: typeof rec.dtype === "string" ? rec.dtype : "",
-                shape: Array.isArray(rec.shape) ? rec.shape.filter((n): n is number => typeof n === "number") : [],
-            });
-        }
+        // A tensor entry without a string dtype and array shape is a malformed
+        // header — fail the whole parse (→ validate() throws) rather than
+        // coercing to `""`/`[]` and rendering a phantom tensor.
+        if (typeof info !== "object" || info === null) return null;
+        const rec = info as Record<string, unknown>;
+        if (typeof rec.dtype !== "string" || !Array.isArray(rec.shape)) return null;
+        tensors.push({
+            name,
+            dtype: rec.dtype,
+            shape: rec.shape.filter((n): n is number => typeof n === "number"),
+        });
     }
     return { tensors, metadata };
 }
