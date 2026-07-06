@@ -1,6 +1,6 @@
 {
     "name": "@plurnk/plurnk-mimetypes-application-safetensors",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "description": "application/x-safetensors (safetensors model weights) mimetype handler for plurnk-service. Reads the JSON header into a tensor inventory without loading weights. Hand-rolled, no parser dependency.",
     "type": "module",
     "license": "MIT",
@@ -50,6 +50,6 @@
         "@plurnk/plurnk-mimetypes": "^0.18.0"
     },
     "peerDependencies": {
-        "@plurnk/plurnk-mimetypes": "^0.16.0 || ^0.17.0 || ^0.18.0"
+        "@plurnk/plurnk-mimetypes": "^0.16.0 || ^0.17.0 || ^0.18.0 || ^0.19.0"
     }
 }
