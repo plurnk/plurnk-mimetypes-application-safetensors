@@ -11,8 +11,8 @@ import type { HandlerContent, MimeSymbol } from "@plurnk/plurnk-mimetypes";
 // names, dtypes, shapes) without loading the file.
 //
 // Symbols are the tensor names; deepJson is the `{ name: { dtype, shape } }`
-// view (a jsonpath target); toText renders `name: dtype [shape]` lines (the
-// regex/glob + embed source). `data_offsets` are dropped from the model-facing
+// view (a jsonpath target); content renders `name: dtype [shape]` lines.
+// Binary regex/glob uses the same rendering. `data_offsets` are dropped from the model-facing
 // views as byte-layout noise. References are not applicable.
 export default class Safetensors extends BaseHandler {
     override extractRaw(content: HandlerContent): MimeSymbol[] {
@@ -30,19 +30,18 @@ export default class Safetensors extends BaseHandler {
         return out;
     }
 
-    override extent(content: HandlerContent): number {
-        const header = readSafetensors(toBytes(content));
-        return header ? header.tensors.length : 0;
+    override validate(content: HandlerContent): void {
+        if (!readSafetensors(toBytes(content))) throw new SyntaxError("not a valid safetensors file (bad header)");
     }
 
-    override validate(content: HandlerContent): void {
-        if (!readSafetensors(toBytes(content))) throw new Error("not a valid safetensors file (bad header)");
+    override content(content: HandlerContent): string | undefined {
+        const header = readSafetensors(toBytes(content));
+        if (!header) return undefined;
+        return header.tensors.map((t) => `${t.name}: ${t.dtype} [${t.shape.join(", ")}]`).join("\n");
     }
 
     protected override toText(content: HandlerContent): string {
-        const header = readSafetensors(toBytes(content));
-        if (!header) return "";
-        return header.tensors.map((t) => `${t.name}: ${t.dtype} [${t.shape.join(", ")}]`).join("\n");
+        return this.content(content) ?? "";
     }
 }
 

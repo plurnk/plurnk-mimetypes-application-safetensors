@@ -14,7 +14,7 @@ A safetensors file is `<uint64 header-length><JSON header><raw tensor bytes>`. T
 
 - `extractRaw(content)` — the tensor names as `field` symbols.
 - `deepJson(content)` — the `{ name: { dtype, shape } }` view, a jsonpath target (`$['model.norm.weight'].shape`). `data_offsets` are dropped as byte-layout noise.
-- `toText` (regex/glob + embed-source) — `name: dtype [shape]` lines.
+- `content` — `name: dtype [shape]` lines, also used for binary regex/glob queries.
 - `validate` — throws on a bad header; every other channel degrades to empty.
 
 References are not applicable.
@@ -22,3 +22,8 @@ References are not applicable.
 ## license
 
 MIT.
+
+## Versioning
+
+This package versions independently. Compatibility is declared by its dependency
+ranges; a Plurnk release does not require a release of this package.
